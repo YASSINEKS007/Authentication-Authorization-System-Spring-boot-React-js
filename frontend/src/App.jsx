@@ -5,6 +5,7 @@ import MainPage from "./pages/MainPage";
 import { useSelector } from "react-redux";
 import NotAuthorized from "./pages/NotAuthorized";
 
+
 function App() {
   const isAuthenticated = useSelector((state) => state.access != null);
 

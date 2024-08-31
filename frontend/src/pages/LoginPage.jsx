@@ -23,6 +23,7 @@ import { jwtDecode } from "jwt-decode";
 import { useDispatch } from "react-redux";
 import { setLogin } from "../store/state";
 import User from "../models/User";
+import { GoogleLogin } from "@react-oauth/google";
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -83,6 +84,13 @@ const LoginPage = () => {
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const responseMessage = (response) => {
+    console.log(response);
+  };
+  const errorMessage = (error) => {
+    console.log(error);
   };
 
   const boxStyles = {
@@ -187,6 +195,15 @@ const LoginPage = () => {
                 >
                   Register Here
                 </span>
+              </Grid>
+              <Grid
+                item
+                xs={12}
+              >
+                <GoogleLogin
+                  onSuccess={responseMessage}
+                  onError={errorMessage}
+                />
               </Grid>
             </Grid>
           </form>

@@ -1,8 +1,7 @@
-import { Box } from "@mui/material";
-import { Button } from "@mui/material";
+import { AppBar, Button, Toolbar, Typography } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { setLogout } from "../store/state";
 import { useNavigate } from "react-router-dom";
+import { setLogout } from "../store/state";
 
 const NavBar = () => {
   const isAuthenticated = useSelector((state) => state.access != null);
@@ -16,23 +15,28 @@ const NavBar = () => {
   };
 
   return (
-    <nav
-      className="flex justify-between items-center bg-green mx-auto rounded-full mt-1"
-      style={{ width: "80%", height: "50px" }}
+    <AppBar
+      position="static"
+      sx={{ backgroundColor: "green", padding: "0 20px" }}
     >
-      <Box sx={{ color: "green" }}>hello</Box>
-
-      <span className="ml-auto">
+      <Toolbar sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+        <Typography
+          variant="h6"
+          sx={{ color: "white", flexGrow: 1, textAlign: "center" }}
+        >
+          Authentication & Authorization JWT Google
+        </Typography>
         {isAuthenticated && (
           <Button
             variant="contained"
+            color="secondary"
             onClick={handleLogout}
           >
             Logout
           </Button>
         )}
-      </span>
-    </nav>
+      </Toolbar>
+    </AppBar>
   );
 };
 
