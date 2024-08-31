@@ -4,21 +4,25 @@ import lombok.AllArgsConstructor;
 import me.projects.backend.entities.Role;
 import me.projects.backend.enums.RoleEnum;
 import me.projects.backend.repositories.RoleRepository;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Optional;
 
 @Component
 @AllArgsConstructor
-public class RoleSeeder implements ApplicationListener<ContextRefreshedEvent> {
+public class RoleSeeder implements ApplicationRunner {
+
     private final RoleRepository roleRepository;
 
-
     @Override
-    public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
-        this.loadRoles();
+    @Transactional
+    public void run(ApplicationArguments args) {
+        loadRoles();
     }
 
     private void loadRoles() {
@@ -28,16 +32,5 @@ public class RoleSeeder implements ApplicationListener<ContextRefreshedEvent> {
                 RoleEnum.ADMIN, "Administrator role",
                 RoleEnum.SUPER_ADMIN, "Super Administrator role"
         );
-
-        Arrays.stream(roleNames).forEach((roleName) -> {
-            Optional<Role> optionalRole = roleRepository.findByName(roleName);
-
-            optionalRole.ifPresentOrElse(System.out::println, () -> {
-                Role roleToCreate = new Role();
-                roleToCreate.setName(roleName);
-                roleToCreate.setDescription(roleDescriptionMap.get(roleName));
-                roleRepository.save(roleToCreate);
-            });
-        });
     }
 }

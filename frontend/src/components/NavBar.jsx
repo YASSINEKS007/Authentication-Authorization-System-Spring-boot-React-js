@@ -1,18 +1,39 @@
+import { Box } from "@mui/material";
+import { Button } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
+import { setLogout } from "../store/state";
+import { useNavigate } from "react-router-dom";
+
 const NavBar = () => {
+  const isAuthenticated = useSelector((state) => state.access != null);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const handleLogout = () => {
+    dispatch(setLogout());
+    console.log("User logged out");
+    navigate("/login");
+  };
+
   return (
-    <nav className="sticky top-0 z-10 bg-white">
-      <div className="max-w-5xl mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          <span className="text-2xl text-gray-900 font-semibold">Logo</span>
-          <div className="flex space-x-4 text-gray-900">
-            <a href="#">Dashboard</a>
-            <a href="#">About</a>
-            <a href="#">Projects</a>
-            <a href="#">Contact</a>
-          </div>
-        </div>
-      </div>
+    <nav
+      className="flex justify-between items-center bg-green mx-auto rounded-full mt-1"
+      style={{ width: "80%", height: "50px" }}
+    >
+      <Box sx={{ color: "green" }}>hello</Box>
+
+      <span className="ml-auto">
+        {isAuthenticated && (
+          <Button
+            variant="contained"
+            onClick={handleLogout}
+          >
+            Logout
+          </Button>
+        )}
+      </span>
     </nav>
   );
 };
+
 export default NavBar;

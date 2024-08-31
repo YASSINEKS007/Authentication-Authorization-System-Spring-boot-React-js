@@ -8,6 +8,7 @@ import me.projects.backend.entities.User;
 import me.projects.backend.enums.RoleEnum;
 import me.projects.backend.repositories.RoleRepository;
 import me.projects.backend.repositories.UserRepository;
+import org.hibernate.Hibernate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,17 +31,20 @@ public class AuthenticationService {
         Optional<Role> optionalRole = roleRepository.findByName(RoleEnum.USER);
 
         if (optionalRole.isEmpty()) {
-            return null;
+            throw new RuntimeException("Role not found");
         }
 
-        var user = new User();
+        User user = new User();
         user.setFullName(input.getFullName());
         user.setEmail(input.getEmail());
+
         user.setPassword(passwordEncoder.encode(input.getPassword()));
+
         user.setRole(optionalRole.get());
 
         return userRepository.save(user);
     }
+
 
     public User authenticate(LoginUserDto input) {
         authenticationManager.authenticate(
@@ -50,7 +54,6 @@ public class AuthenticationService {
                 )
         );
 
-        return userRepository.findByEmail(input.getEmail())
-                .orElseThrow();
+        return userRepository.findByEmail(input.getEmail());
     }
 }

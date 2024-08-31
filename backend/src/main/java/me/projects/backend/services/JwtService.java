@@ -5,14 +5,18 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import me.projects.backend.entities.User;
+import me.projects.backend.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
 @Service
@@ -22,6 +26,15 @@ public class JwtService {
 
     @Value("${security.jwt.expiration-time}")
     private long jwtExpiration;
+
+    @Value("${security.jwt.refresh-token-expiration-time}")
+    private long refreshTokenExpiration;
+
+    private final UserRepository userRepository;
+
+    public JwtService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -40,6 +53,10 @@ public class JwtService {
         return buildToken(extraClaims, userDetails, jwtExpiration);
     }
 
+    public String generateRefreshToken(UserDetails userDetails) {
+        return buildToken(new HashMap<>(), userDetails, refreshTokenExpiration);
+    }
+
     public long getExpirationTime() {
         return jwtExpiration;
     }
@@ -49,6 +66,15 @@ public class JwtService {
             UserDetails userDetails,
             long expiration
     ) {
+
+        User user = userRepository.findByEmail(userDetails.getUsername());
+        extraClaims.put("fullName", user.getFullName());
+        extraClaims.put("id", user.getId());
+        extraClaims.put("createdAt", user.getCreatedAt().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()); 
+        extraClaims.put("updatedAt", user.getUpdatedAt().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
+
+
+        extraClaims.put("roles", userDetails.getAuthorities());
         return Jwts
                 .builder()
                 .setClaims(extraClaims)

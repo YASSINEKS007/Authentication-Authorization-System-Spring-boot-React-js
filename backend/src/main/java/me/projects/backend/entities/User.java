@@ -18,6 +18,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
+@ToString
 @Table(name = "app_user")
 public class User implements UserDetails {
     @Id
@@ -74,7 +75,7 @@ public class User implements UserDetails {
         return true;
     }
 
-    @OneToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne
     @JoinColumn(name = "role_id", referencedColumnName = "id", nullable = false)
     private Role role;
 

@@ -19,10 +19,15 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { jwtDecode } from "jwt-decode";
+import { useDispatch } from "react-redux";
+import { setLogin } from "../store/state";
+import User from "../models/User";
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const schema = yup.object().shape({
     email: yup
@@ -31,7 +36,7 @@ const LoginPage = () => {
       .email("Must be a valid email"),
     password: yup
       .string()
-      .min(8, "Password must be at least 8 characters")
+      // .min(8, "Password must be at least 8 characters")
       .required("Password is required"),
   });
 
@@ -49,12 +54,32 @@ const LoginPage = () => {
 
   const login = async (data) => {
     try {
-      const response = await api.post(`/login`, {
+      const response = await api.post(`/auth/login`, {
         password: data.password,
         email: data.email,
       });
-      console.log(response);
-      navigate("/dashboard");
+      const { token, refreshToken } = response.data;
+
+      const decodeToken = jwtDecode(token);
+
+      const authenticatedUser = new User({
+        id: decodeToken.id,
+        fullName: decodeToken.fullName,
+        email: decodeToken.sub,
+        createdAt: decodeToken.createdAt,
+        updatedAt: decodeToken.updatedAt,
+        role: decodeToken.roles[0]["authority"],
+      });
+
+      dispatch(
+        setLogin({
+          user: authenticatedUser.toPlainObject(),
+          access: token,
+          refresh: refreshToken,
+        })
+      );
+
+      navigate("/");
     } catch (error) {
       console.log(error);
     }
@@ -87,32 +112,6 @@ const LoginPage = () => {
               <Grid
                 item
                 xs={12}
-                sm={6}
-              >
-                <TextField
-                  id="firstName"
-                  label="First Name"
-                  variant="outlined"
-                  fullWidth
-                  required
-                />
-              </Grid>
-              <Grid
-                item
-                xs={12}
-                sm={6}
-              >
-                <TextField
-                  id="lastName"
-                  label="Last Name"
-                  variant="outlined"
-                  fullWidth
-                  required
-                />
-              </Grid>
-              <Grid
-                item
-                xs={12}
               >
                 <TextField
                   id="email"
@@ -132,7 +131,6 @@ const LoginPage = () => {
                 <FormControl
                   variant="outlined"
                   fullWidth
-                  required
                   error={!!errors.password}
                 >
                   <InputLabel htmlFor="password">Password</InputLabel>

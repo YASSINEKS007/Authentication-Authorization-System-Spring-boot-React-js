@@ -37,15 +37,16 @@ const RegisterPage = () => {
     },
   };
 
-  const register_user = async () => {
-    try{
-      const response = await api.post("/register",{
-        fullName : fullName,
-        email : email,
-        password : password
-      })
-    }catch{
-
+  const register_user = async (data) => {
+    try {
+      const response = await api.post("/auth/register", {
+        fullName: data.fullName,
+        email: data.email,
+        password: data.password,
+      });
+      console.log(response);
+    } catch (error) {
+      console.log("error", error);
     }
   };
 
@@ -78,13 +79,12 @@ const RegisterPage = () => {
                   label="Full Name"
                   variant="outlined"
                   fullWidth
-                  required
                   {...register("fullName")}
                   error={!!errors.fullName}
                   helperText={errors.fullName?.message}
                 />
               </Grid>
-              
+
               <Grid
                 item
                 xs={12}
@@ -110,7 +110,6 @@ const RegisterPage = () => {
                   variant="outlined"
                   type="password"
                   fullWidth
-                  required
                   {...register("password")}
                   error={!!errors.password}
                   helperText={errors.password?.message}

@@ -32,7 +32,8 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(ar -> ar.requestMatchers("/auth/login/**", "/auth/signup/**").permitAll())
+                .cors(corsProperties -> corsProperties.configurationSource(this.corsConfigurationSource()))
+                .authorizeHttpRequests(ar -> ar.requestMatchers("/auth/login/**", "/auth/register/**").permitAll())
                 .authorizeHttpRequests(ar -> ar.anyRequest().authenticated())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
@@ -42,7 +43,7 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    CorsConfigurationSource corsConfigurationSource(ConversionService conversionService) {
+    CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList(corsProperties.getAllowedOrigin()));
         configuration.setAllowedHeaders(Arrays.asList(corsProperties.getAllowedHeaders()));
