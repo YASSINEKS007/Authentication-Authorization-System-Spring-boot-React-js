@@ -8,6 +8,7 @@ import me.projects.backend.entities.User;
 import me.projects.backend.services.AuthenticationService;
 import me.projects.backend.services.JwtService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -60,5 +61,10 @@ public class AuthenticationController {
         String newAccessToken = jwtService.generateToken(userDetails);
         return ResponseEntity.ok(Map.of("accessToken", newAccessToken));
     }
+
+    public String getCurrentUser(@AuthenticationPrincipal UserDetails user) {
+        return user.getUsername();
+    }
+
 
 }

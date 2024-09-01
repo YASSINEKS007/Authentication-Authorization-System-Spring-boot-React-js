@@ -72,9 +72,8 @@ public class JwtService {
         extraClaims.put("id", user.getId());
         extraClaims.put("createdAt", user.getCreatedAt().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()); 
         extraClaims.put("updatedAt", user.getUpdatedAt().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
-
-
         extraClaims.put("roles", userDetails.getAuthorities());
+
         return Jwts
                 .builder()
                 .setClaims(extraClaims)
