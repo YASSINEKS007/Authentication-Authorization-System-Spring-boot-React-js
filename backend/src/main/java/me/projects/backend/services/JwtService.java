@@ -6,6 +6,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import me.projects.backend.entities.User;
+import me.projects.backend.exceptions.TokenExpiredException;
 import me.projects.backend.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,7 +17,6 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 
 @Service
@@ -86,8 +86,14 @@ public class JwtService {
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+
+        if (isTokenExpired(token)) {
+            throw new TokenExpiredException("JWT token has expired");
+        }
+
+        return username.equals(userDetails.getUsername());
     }
+
 
     private boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
